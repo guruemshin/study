@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>MAP</title>
+   <script type="text/javascript" src="인증키"></script>
+</head>
+<body>
+      <script>
+            var arr=new Array();
+
+            function toServer(){
+               let addr=document.querySelector("#addr").value;
+               arr.push(addr);      // 역삼동 : 위도, 경도
+
+               let url="https://dapi.kakao.com/v2/local/search/address.json";    
+               let params="query="+ encodeURI(addr);      
+               let urlParams=url + "?" + params;
+               arr.push(urlParams);
+
+              fetch(urlParams, {
+                  headers : { "Authorization": "인증키"}
+              })
+
+              .then(function (response){
+                  return response.json();
+              })
+
+              .then(function (data){
+                  arr.push(data);
+                  arr.push(data.documents[0].x);
+                  // alert(arr.join("\n"));
+
+                 let y=data.documents[0].y;
+                 let x=data.documents[0].x;
+
+                 var mapContainer = document.getElementById('map'), 
+                 mapOption = { 
+                    center: new kakao.maps.LatLng(y, x), 
+                    level: 3 
+                };
+
+                var map = new kakao.maps.Map(mapContainer, mapOption); 
+              })
+
+              .catch(function (error){
+                  document.write("실패=====>", error);
+              });
+
+              // 1시 시작합니다.
+            }
+      </script>
+
+      <h3>주소입력</h3>
+      <input  id="addr" type="text">
+      <input type="button" value="검색" onclick="toServer()">
+      <br><br>
+
+      <!-- 지도출력-->
+      <div id="map" style="width:80%;height:500px;"></div>
+</body>
+</html>
